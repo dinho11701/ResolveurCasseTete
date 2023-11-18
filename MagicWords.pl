@@ -73,6 +73,49 @@ word_concatenation(word(Word1),word(Word2),word(Word3)) :-
 rewrite_prefix_by_rule(rule(word(Prefix), word(Replacement)), word(W1), word(W2)) :- 
     append(Prefix, Suffix, W1),  % Trouver un préfixe de W1 qui correspond à Prefix.
     append(Replacement, Suffix, W2).  % Remplacer ce préfixe par Replacement pour obtenir W2.
+    
+
+
+% Ce prédicat met en relation la règle _rule et les deux mots _w1 et _w2 lorsque
+% _w2 peut être obtenu à partir de _w1 en y appliquant _rule sur l'un de ses facteurs.
+rewrite_factor_by_rule(rule(word(Factor), word(Replacement)), word(W1), word(W2)) :- 
+    append(Prefix, Rest, W1),          % Trouver un préfixe de W1 et le reste.
+    append(Factor, Suffix, Rest),      % Vérifier si Factor est un facteur de W1.
+    append(Replacement, Suffix, NewRest), % Remplacer Factor par Replacement.
+    append(Prefix, NewRest, W2).          % Obtenir le nouveau mot W2.
+
+
+% Ce prédicat met en relation l'ensemble de règles _rule_set et les deux mots _w1 et
+% _w2 lorsque _w2 peut être obtenu à partir de _w1 en y appliquant une règle de
+% _rule_set sur l'un de ses facteurs.
+% Ce prédicat est vrai lorsque w2 peut être obtenu à partir de w1 en y appliquant une règle de rule_set sur l'un de ses facteurs.
+rewrite([], _, _).  % Échoue si aucune règle ne permet de faire la transformation.
+rewrite([RuleToApply|_], word(W1), word(W2)) :-
+    rewrite_factor_by_rule(RuleToApply, word(W1), word(W2)).
+rewrite([_|RestRulesToApply], word(W1), word(W2)) :-
+    rewrite(RestRulesToApply, word(W1), word(W2)).
+
+
+% Ce prédicat met en relation l'ensemble de règles _rule_set, l'entier _len, le mot
+% _w1, le chemin _path et le mot _w2 lorsque _path est un chemin de longueur _len
+% de réécritures permettant de transformer _w1 en _w2 par le biais des règles de
+% réécriture de _regles.
+% Ce prédicat est vrai lorsque Path est un chemin de longueur Len de réécritures permettant de transformer W1 en W2 par le biais des règles de réécriture de RuleSet.
+
+% Prédicat auxiliaire pour gérer la récursion et le chemin
+connecting_path_helper(_, 0, word(W), PathAcc, word(W), Path) :-
+    reverse(PathAcc, Path).  % Inverse l'accumulation pour obtenir le chemin dans l'ordre correct.
+connecting_path_helper(RuleSet, Len, word(W1), PathAcc, word(W2), Path) :-
+    Len > 0,
+    member(rule(word(Factor), word(Replacement)), RuleSet),  % Sélectionne une règle de RuleSet.
+    rewrite_factor_by_rule(rule(word(Factor), word(Replacement)), word(W1), word(IntermediateW)),
+    NewLen is Len - 1,
+    connecting_path_helper(RuleSet, NewLen, word(IntermediateW), [rule(word(Factor), word(Replacement))|PathAcc], word(W2), Path).
+
+% Prédicat principal pour connecting_path
+connecting_path(RuleSet, Len, word(W1), path(Path), word(W2)) :-
+    connecting_path_helper(RuleSet, Len, word(W1), [], word(W2), Path).
+
 
 
 % Prédicat principal (main)
@@ -116,8 +159,8 @@ main :-
 
 *******************************************************************************/
     
-    
-    
+/******************************************************************************
+
     print_path( path([]) ),
         
     nl,
@@ -147,7 +190,28 @@ main :-
     nl,
     
     % Affichage du résultat
-    print_word(word(NewWord)).
+    print_word(word(NewWord)),
+*******************************************************************************/
+    
+    RuleToApply = [rule(word([1,1]), word([1])), rule(word([1,2]), word([2,1,2])), rule(word([2,1]), word([]))],
+    rewrite(RuleToApply, word([1,2,1,1]), word(W2)),
+    print_word(word(W2)),
+    
+    
+    RuleSet = rule_set(
+            [
+                rule(word([1, 1]), word([1])),
+                rule(word([1, 2]), word([2, 1, 2])),
+                rule(word([2, 1]), word([]))
+            ]
+        ),
+    _len is 3,
+    connecting_path(RuleSet, _len, word([1,2,1]), path(Path), word([])),
+    print_word(word(Path)).
+    
+    
+    
+    
     
     
 

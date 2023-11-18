@@ -45,11 +45,15 @@ print_rule_set(rule_set([H|T])) :-
 print_puzzle(puzzle(rule_set(RULE_SET)) , word(WORD)) :-
     print_rule_set(rule_set(RULE_SET)),
     print_word(word(WORD)).
+    
+    
+% Ce prédicat est vrai lorsque _path est un chemin et l'imprime.
+print_path( path(LST) ) :-
+    print_word_list(LST).
+    
    
    
    
-
-
 
 % Prédicat principal (main)
 main :-
@@ -73,9 +77,17 @@ main :-
     print_puzzle( puzzle( rule_set(
         [rule(word([1, 1]), word([1])),
         rule(word([1, 2]), word([2, 1, 2])),
-        rule(word([2, 1]), word([]))]) ) ,  word([1, 2, 1, 1]) ).
-       
+        rule(word([2, 1]), word([]))]) ) ,  word([1, 2, 1, 1]) ),
     
+    nl,
+    
+    print_path( path([
+            word([1, 2, 1, 1]),
+            word([1, 2, 1]),
+            word([2, 1, 2, 1]),
+            word([2, 1]),
+            word([])
+        ]) ).
        
    
    

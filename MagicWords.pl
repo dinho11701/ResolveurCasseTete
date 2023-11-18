@@ -48,8 +48,24 @@ print_puzzle(puzzle(rule_set(RULE_SET)) , word(WORD)) :-
     
     
 % Ce prédicat est vrai lorsque _path est un chemin et l'imprime.
+print_path( path([]) ).
 print_path( path(LST) ) :-
     print_word_list(LST).
+    
+
+
+% Ce prédicat est vrai lorsque _lst est une liste de chemins et l'imprime, avec un chemin par ligne.
+print_path_list([]).
+print_path_list([H|T]) :-
+    print_path(H),
+    nl,
+    print_path_list(T).
+    % print_path(path(T)).
+    
+
+
+
+
     
    
    
@@ -69,6 +85,9 @@ main :-
     % print_rule(rule(word([1,2]),word([2,1,2]))).
     % nl.
 
+
+    
+    /******************************************************************************
     print_rule_set(rule_set(
         [rule(word([1, 1]), word([1])),
         rule(word([1, 2]), word([2, 1, 2])),
@@ -87,8 +106,36 @@ main :-
             word([2, 1, 2, 1]),
             word([2, 1]),
             word([])
-        ]) ).
-       
+        ]) ),
+        
+    nl,
+
+*******************************************************************************/
+    
+    
+    
+    print_path( path([]) ),
+        
+    nl,
+    
+    Chemin1 = path([
+            word([1, 2, 1, 1]),
+            word([1, 2, 1]),
+            word([2, 1, 2, 1]),
+            word([2, 1]),
+            word([])
+        ]),
+    
+    Chemin2 = path([
+            word([1,2,3]),
+            word([4,5,6]),
+            word([7,8,9]),
+            word([])
+        ]),
+
+    print_path_list( [ Chemin2,Chemin1 ] ).
+    
+    
    
    
    

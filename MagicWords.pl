@@ -67,6 +67,13 @@ word_concatenation(word(Word1),word(Word2),word(Word3)) :-
 
 
 
+% Ce prédicat met en relation la règle _rule et les deux mots _w1 et _w2 lorsque
+% _w2 peut être obtenu à partir de _w1 en y appliquant _rule sur l'un de ses
+% préfixes.
+rewrite_prefix_by_rule(rule(word(Prefix), word(Replacement)), word(W1), word(W2)) :- 
+    append(Prefix, Suffix, W1),  % Trouver un préfixe de W1 qui correspond à Prefix.
+    append(Replacement, Suffix, W2).  % Remplacer ce préfixe par Replacement pour obtenir W2.
+
 
 % Prédicat principal (main)
 main :-
@@ -134,7 +141,14 @@ main :-
     
     word_concatenation(word([1,2]),word([3,4]),word(Word3)),
     
-    print_word(word(Word3)). 
+    print_word(word(Word3)),
+
+    rewrite_prefix_by_rule(rule(word([1, 2]), word([2,1,2])), word([1,2,1]), word(NewWord)),
+    nl,
+    
+    % Affichage du résultat
+    print_word(word(NewWord)).
+    
     
 
     

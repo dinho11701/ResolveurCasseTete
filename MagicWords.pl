@@ -60,16 +60,13 @@ print_path_list([H|T]) :-
     print_path(H),
     nl,
     print_path_list(T).
-    % print_path(path(T)).
-    
+
+% Ce prédicat met en relation les trois mots _w1, _w2 et _w3 lorsque _w3 est la concaténation de _w1 et _w2.
+word_concatenation(word(Word1),word(Word2),word(Word3)) :- 
+    append(Word1,Word2,Word3).
 
 
 
-
-    
-   
-   
-   
 
 % Prédicat principal (main)
 main :-
@@ -133,8 +130,13 @@ main :-
             word([])
         ]),
 
-    print_path_list( [ Chemin2,Chemin1 ] ).
+    print_path_list( [ Chemin2,Chemin1 ] ),
     
+    word_concatenation(word([1,2]),word([3,4]),word(Word3)),
+    
+    print_word(word(Word3)). 
+    
+
     
    
    
@@ -142,4 +144,3 @@ main :-
 
 % Exécution automatique de main au démarrage.
 :- main.
-

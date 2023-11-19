@@ -118,6 +118,60 @@ connecting_path(RuleSet, Len, word(W1), path(Path), word(W2)) :-
 
 
 
+% Ce prédicat met en relation l'instance de casse-tête _puzzle, l'entier _len et le
+% chemin _solution lorsque _solution est une solution de longueur _len de l'instance
+% _puzzles de casse-tête.
+% puzzle_solution est vrai si Solution est une solution de longueur Len pour le casse-tête Puzzle
+puzzle_solution(puzzle(RuleSet, MotDeart), Len, Solution) :-
+    % Le but est de transformer InitialWord en un mot vide (mot magique) en utilisant les règles dans RuleSet
+    connecting_path(RuleSet, Len, MotDeart, Solution, word([])).
+
+
+
+
+% Ce prédicat met en relation les règles _rule_1 et _rule_2 lorsque _rule_2 est
+% obtenue en échangeant les deux mots constituant _rule_1.
+% Ce prédicat est vrai lorsque rule_2 est obtenue en échangeant les deux mots constituant rule_1.
+rule_reversion(rule(word(Word1), word(Word2)), rule(word(Word2), word(Word1))).
+
+
+
+
+% Ce prédicat met en relation l'ensemble de règles _rule_set, l'entier _len et le mot
+% _w lorsque _w est un mot R-magique admettant une solution de longueur _len où R
+% est l'ensemble _rule_set.
+% Ce prédicat est vrai si w est un mot R-magique admettant une solution de longueur len où R est l'ensemble rule_set.
+magic_word_of_rule_set(RuleSet, Len, word(W)) :-
+    connecting_path(RuleSet, Len, word(W), path(Path), word([])),
+    length(Path, Len).  % Vérifie que la longueur du chemin trouvé est égale à Len.
+
+
+
+
+% Ce prédicat génère tous les mots possibles jusqu'à une certaine longueur.
+generate_all_words(MaxLen, Words) :-
+    findall(Word, between(1, MaxLen, Len), generate_word(Len, Word), Words).
+
+% Génère un mot de longueur spécifiée.
+generate_word(Len, word(Word)) :-
+    length(Word, Len),
+    maplist(between(0, 9), Word).  % Ici, on suppose que les "lettres" du mot sont des chiffres de 0 à 9.
+
+% Ce prédicat est vrai lorsque MagicWords est la liste de tous les mots R-magiques pour RuleSet avec une solution de longueur Len.
+all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
+    MaxWordLen is Len * 2,  % Hypothèse sur la longueur maximale des mots à générer.
+    generate_all_words(MaxWordLen, AllWords),
+    include(magic_word_of_rule_set_helper(RuleSet, Len), AllWords, MagicWords).
+
+% Helper pour filtrer les mots R-magiques.
+magic_word_of_rule_set_helper(RuleSet, Len, Word) :-
+    magic_word_of_rule_set(RuleSet, Len, Word).
+
+
+
+
+
+
 % Prédicat principal (main)
 main :-
 
@@ -193,21 +247,40 @@ main :-
     print_word(word(NewWord)),
 *******************************************************************************/
     
-    RuleToApply = [rule(word([1,1]), word([1])), rule(word([1,2]), word([2,1,2])), rule(word([2,1]), word([]))],
-    rewrite(RuleToApply, word([1,2,1,1]), word(W2)),
-    print_word(word(W2)),
+    % RuleToApply = [rule(word([1,1]), word([1])), rule(word([1,2]), word([2,1,2])), rule(word([2,1]), word([]))],
+    % rewrite(RuleToApply, word([1,2,1,1]), word(W2)),
+    % print_word(word(W2)),
     
     
-    RuleSet = rule_set(
+    /**RuleSet = rule_set(
             [
                 rule(word([1, 1]), word([1])),
                 rule(word([1, 2]), word([2, 1, 2])),
                 rule(word([2, 1]), word([]))
             ]
-        ),
-    _len is 3,
-    connecting_path(RuleSet, _len, word([1,2,1]), path(Path), word([])),
-    print_word(word(Path)).
+        ),**/
+    % _len is 3,
+    % connecting_path(RuleSet, _len, word([1,2,1]), path(Path), word([])),
+    % print_word(word(Path)).
+    
+    % Définir un ensemble de règles de réécriture pour le casse-tête
+    RuleSet1 = [rule(word([1, 1]), word([1])),
+                rule(word([1, 2]), word([2,1,2])),
+               rule(word([2,1]), word([]))],
+               
+    
+    
+    % Définir le mot initial du casse-tête
+    InitialWord = word([1, 2, 1, 1]), 
+
+    % Définir la longueur maximale souhaitée pour la solution
+    MaxLength = 5,
+
+    % Appeler puzzle_solution pour trouver une solution au casse-tête
+    (   puzzle_solution(puzzle(RuleSet1, InitialWord), MaxLength, Solution)
+    ->  write('Une solution pour le casse-tête est : '), write(Solution), nl
+    ;   write('Aucune solution trouvée pour le casse-tête dans la limite de longueur donnée.'), nl
+    ).
     
     
     

@@ -181,23 +181,35 @@ main :-
     % print_word(word(Path)).
 
     % Définir un ensemble de règles de réécriture pour le casse-tête
-    RuleSet1 = [rule(word([1, 1]), word([1])),
-                rule(word([1, 2]), word([2,1,2])),
-               rule(word([2,1]), word([]))],
+    %RuleSet1 = [rule(word([1, 1]), word([1])),
+     %           rule(word([1, 2]), word([2,1,2])),
+      %         rule(word([2,1]), word([]))],
 
 
 
     % Définir le mot initial du casse-tête
-    InitialWord = word([1, 2, 1, 1]),
+    %InitialWord = word([1, 2, 1, 1]),
 
     % Définir la longueur maximale souhaitée pour la solution
-    MaxLength = 5,
+    %MaxLength = 5,
+
+    write('w'),
+    %rewrite_prefix_by_rule(rule(word([1, 2]), word([3,3])), word([1,2,1,1]), word(NewWord)),
+    rewrite_factor_by_rule(rule(word([1, 2]), word([2,1,2])), word([1,2,1,1]), word(NewWord1)),
+    %rewrite_factor_by_rule(rule(word([1, 2]), word([2, 1, 2])), InitialWord, word(W2)).
+    %print_word(word(NewWord)).
+    print_word(word(NewWord1)).
+    %write('g').
+
+    %rewrite(RuleSet1, word([1,2,1,1]), word(W2)),
+    %write('g'),
+    %print_word(word(W2)).
 
     % Appeler puzzle_solution pour trouver une solution au casse-tête
-    (   puzzle_solution(puzzle(RuleSet1, InitialWord), MaxLength, Solution)
-    ->  write('Une solution pour le casse-tête est : '), write(Solution), nl
-    ;   write('Aucune solution trouvée pour le casse-tête dans la limite de longueur donnée.'), nl
-    ).
+    %(   puzzle_solution(puzzle(RuleSet1, InitialWord), MaxLength, Solution)
+    %->  write('Une solution pour le casse-tête est : '), write(Solution), nl
+    %;   write('Aucune solution trouvée pour le casse-tête dans la limite de longueur donnée.'), nl
+    %).
 
 
 

@@ -83,12 +83,20 @@ rewrite_prefix_by_rule(rule(word(Prefix), word(Replacement)), word(W1), word(W2)
 
 % Ce prédicat met en relation la règle _rule et les deux mots _w1 et _w2 lorsque
 % _w2 peut être obtenu à partir de _w1 en y appliquant _rule sur l'un de ses facteurs.
-rewrite_factor_by_rule(rule(word(Factor), word(Replacement)), word(W1), word(W2)) :- 
-    append(Prefix, Rest, W1),          % Trouver un préfixe de W1 et le reste.
-    append(Factor, Suffix, Rest),      % Vérifier si Factor est un facteur de W1.
-    append(Replacement, Suffix, NewRest), % Remplacer Factor par Replacement.
-    append(Prefix, NewRest, W2).          % Obtenir le nouveau mot W2.
+% Ce prédicat applique une règle sur un facteur d'un mot.
+% This predicate relates the rule 'rule' and the two words 'w1' and 'w2' where
+% 'w2' can be obtained from 'w1' by applying 'rule' on one of its factors.
+% This predicate relates the rule 'rule' and the two words 'w1' and 'w2' where
+% 'w2' can be obtained from 'w1' by applying 'rule' on one of its factors.
+rewrite_factor_by_rule(rule(word(Factor), word(Replacement)), word(W1), word(W2)) :-
+    append(Prefix, Suffix, W1),            % Split W1 into Prefix and Suffix.
+    rewrite_prefix_by_rule(rule(word(Factor), word(Replacement)), word(Suffix), word(Intermediate)), % Apply the rule on Suffix.
+    append(Prefix, Intermediate, W2),      % Concatenate Prefix and Intermediate to get W2.
+    !.                                      % Cut to prevent backtracking to other solutions.
 
+rewrite_factor_by_rule(Rule, word([H|T]), word(W2)) :-
+    rewrite_factor_by_rule(Rule, word(T), word(W2Tail)), % Recursive call on the tail of the word.
+    append([H], W2Tail, W2).                            % Add the head back to the transformed tail.
 
 % Ce prédicat met en relation l'ensemble de règles _rule_set et les deux mots _w1 et
 % _w2 lorsque _w2 peut être obtenu à partir de _w1 en y appliquant une règle de
@@ -107,19 +115,21 @@ rewrite([_|RestRulesToApply], word(W1), word(W2)) :-
 % réécriture de _regles.
 % Ce prédicat est vrai lorsque Path est un chemin de longueur Len de réécritures permettant de transformer W1 en W2 par le biais des règles de réécriture de RuleSet.
 
-% Prédicat auxiliaire pour gérer la récursion et le chemin
+% Ce prédicat est vrai lorsque Path est un chemin de longueur Len de réécritures permettant de transformer W1 en W2 par le biais des règles de réécriture de RuleSet.
+connecting_path(RuleSet, Len, word(W1), path(Path), word(W2)) :-
+    connecting_path_helper(RuleSet, Len, word(W1), [], word(W2), Path).
+
+% Prédicat auxiliaire pour gérer la récursion et le chemin de réécriture.
 connecting_path_helper(_, 0, word(W), PathAcc, word(W), Path) :-
     reverse(PathAcc, Path).  % Inverse l'accumulation pour obtenir le chemin dans l'ordre correct.
 connecting_path_helper(RuleSet, Len, word(W1), PathAcc, word(W2), Path) :-
     Len > 0,
-    member(rule(word(Factor), word(Replacement)), RuleSet),  % Sélectionne une règle de RuleSet.
-    rewrite_factor_by_rule(rule(word(Factor), word(Replacement)), word(W1), word(IntermediateW)),
+    member(Rule, RuleSet),  % Sélectionne une règle de RuleSet.
+    rewrite_factor_by_rule(Rule, word(W1), word(IntermediateW)),
     NewLen is Len - 1,
-    connecting_path_helper(RuleSet, NewLen, word(IntermediateW), [rule(word(Factor), word(Replacement))|PathAcc], word(W2), Path).
+    connecting_path_helper(RuleSet, NewLen, word(IntermediateW), [Rule|PathAcc], word(W2), Path).
 
-% Prédicat principal pour connecting_path
-connecting_path(RuleSet, Len, word(W1), path(Path), word(W2)) :-
-    connecting_path_helper(RuleSet, Len, word(W1), [], word(W2), Path).
+
 
 
 
@@ -127,10 +137,23 @@ connecting_path(RuleSet, Len, word(W1), path(Path), word(W2)) :-
 % chemin _solution lorsque _solution est une solution de longueur _len de l'instance
 % _puzzles de casse-tête.
 % puzzle_solution est vrai si Solution est une solution de longueur Len pour le casse-tête Puzzle
-puzzle_solution(puzzle(RuleSet, MotDeart), Len, Solution) :-
+%puzzle_solution(puzzle(RuleSet, MotDeart), Len, Solution) :-
     % Le but est de transformer InitialWord en un mot vide (mot magique) en utilisant les règles dans RuleSet
-    connecting_path(RuleSet, Len, MotDeart, Solution, word([])).
+    %connecting_path(RuleSet, Len, MotDeart, Solution, word([])).
 
+% Ce prédicat est vrai si Solution est une solution de longueur Len pour le casse-tête Puzzle.
+% Il génère des solutions et échoue si aucune solution n'est trouvée dans la limite de longueur donnée.
+%puzzle_solution(puzzle(RuleSet, InitialWord), MaxLength, Solution) :-
+  %  connecting_path(RuleSet, MaxLength, word(InitialWord), path(Solution), word([])),
+ %   length(Solution, Length),
+%    Length =< MaxLength.
+
+
+% Ce prédicat est vrai si Solution est une solution de longueur MaxLength pour le casse-tête Puzzle.
+puzzle_solution(puzzle(RuleSet, InitialWord), MaxLength, Solution) :-
+    connecting_path(RuleSet, MaxLength, word(InitialWord), path(Solution), word([])),
+    length(Solution, Length),
+    Length =< MaxLength.
 
 
 
@@ -151,8 +174,7 @@ magic_word_of_rule_set(RuleSet, Len, word(W)) :-
     length(Path, Len).  % Vérifie que la longueur du chemin trouvé est égale à Len.
 
 
-
-
+/*
 % Ce prédicat génère tous les mots possibles jusqu'à une certaine longueur.
 generate_all_words(MaxLen, Words) :-
     findall(Word, between(1, MaxLen, Len), generate_word(Len, Word), Words).
@@ -177,6 +199,42 @@ magic_word_of_rule_set_helper(RuleSet, Len, Word) :-
 all_puzzle_solutions(Puzzle, MaxLength, Solutions) :-
     findall(Solution, puzzle_solution(Puzzle, MaxLength, Solution), Solutions).
 
+*/
 
+
+
+
+% Génère tous les mots possibles jusqu'à une certaine longueur.
+generate_all_words(MaxLen, Words) :-
+    findall(Word, (between(1, MaxLen, Len), generate_word(Len, Word)), Words).
+
+% Génère un mot de longueur spécifiée.
+generate_word(Len, word(Word)) :-
+    length(Word, Len),
+    maplist(between(0, 9), Word).  % Les "lettres" du mot sont des chiffres de 0 à 9.
+
+
+% Helper pour filtrer les mots R-magiques.
+magic_word_of_rule_set_helper(RuleSet, Len, Word) :-
+    magic_word_of_rule_set(RuleSet, Len, Word).
+
+% Ce prédicat est vrai lorsque MagicWords est la liste de tous les mots R-magiques pour RuleSet avec une solution de longueur Len.
+all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
+    MaxWordLen is Len * 2,  % Hypothèse sur la longueur maximale des mots à générer.
+    generate_all_words(MaxWordLen, AllWords),
+    include(magic_word_of_rule_set_helper(RuleSet, Len), AllWords, MagicWords).
+
+% Trouve toutes les solutions possibles pour un puzzle donné jusqu'à une certaine longueur.
+%all_puzzle_solutions(Puzzle, MaxLength, Solutions) :-
+ %   findall(Solution, puzzle_solution(Puzzle, MaxLength, Solution), Solutions).
+
+
+% Trouve toutes les solutions possibles pour un puzzle donné jusqu'à une certaine longueur.
+all_puzzle_solutions(Puzzle, MaxLength, Solutions) :-
+    findall(Solution, (puzzle_solution(Puzzle, MaxLength, Solution), Solution \= []), Solutions).
+
+
+
+%--------------------------
 
 

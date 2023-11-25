@@ -42,11 +42,16 @@ print_rule_set(rule_set([H|T])) :-
 
 
 % Ce prédicat est vrai lorsque le terme _puzzle est une instance de casse-tête et l'imprime.
-print_puzzle(puzzle(rule_set(RULE_SET)) , word(WORD)) :-
-    print_rule_set(rule_set(RULE_SET)),
-    print_word(word(WORD)).
-    
-    
+%print_puzzle(puzzle(rule_set(RULE_SET)) , word(WORD)) :-
+ %   print_rule_set(rule_set(RULE_SET)),
+%    print_word(word(WORD)).
+
+% Ce prédicat est vrai lorsque le terme _puzzle est une instance de casse-tête et l'imprime.
+print_puzzle(puzzle(RuleSet, Word)) :-
+    print_rule_set(RuleSet),
+    print_word(Word).
+
+
 % Ce prédicat est vrai lorsque _path est un chemin et l'imprime.
 print_path( path([]) ).
 print_path( path(LST) ) :-
@@ -166,6 +171,11 @@ all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
 % Helper pour filtrer les mots R-magiques.
 magic_word_of_rule_set_helper(RuleSet, Len, Word) :-
     magic_word_of_rule_set(RuleSet, Len, Word).
+
+
+% Trouve toutes les solutions possibles pour un puzzle donné jusqu'à une certaine longueur.
+all_puzzle_solutions(Puzzle, MaxLength, Solutions) :-
+    findall(Solution, puzzle_solution(Puzzle, MaxLength, Solution), Solutions).
 
 
 

@@ -84,29 +84,29 @@ rewrite_prefix_by_rule(rule(word(Prefix), word(Replacement)), word(W1), word(W2)
 % Ce prédicat met en relation la règle _rule et les deux mots _w1 et _w2 lorsque
 % _w2 peut être obtenu à partir de _w1 en y appliquant _rule sur l'un de ses facteurs.
 % Ce prédicat applique une règle sur un facteur d'un mot.
-% This predicate relates the rule 'rule' and the two words 'w1' and 'w2' where
-% 'w2' can be obtained from 'w1' by applying 'rule' on one of its factors.
-% This predicate relates the rule 'rule' and the two words 'w1' and 'w2' where
-% 'w2' can be obtained from 'w1' by applying 'rule' on one of its factors.
+
 rewrite_factor_by_rule(rule(word(Factor), word(Replacement)), word(W1), word(W2)) :-
     append(Prefix, Suffix, W1),            % Split W1 into Prefix and Suffix.
     rewrite_prefix_by_rule(rule(word(Factor), word(Replacement)), word(Suffix), word(Intermediate)), % Apply the rule on Suffix.
     append(Prefix, Intermediate, W2),      % Concatenate Prefix and Intermediate to get W2.
     !.                                      % Cut to prevent backtracking to other solutions.
 
-rewrite_factor_by_rule(Rule, word([H|T]), word(W2)) :-
-    rewrite_factor_by_rule(Rule, word(T), word(W2Tail)), % Recursive call on the tail of the word.
-    append([H], W2Tail, W2).                            % Add the head back to the transformed tail.
+%rewrite_factor_by_rule(Rule, word([H|T]), word(W2)) :-
+ %   rewrite_factor_by_rule(Rule, word(T), word(W2Tail)), % Recursive call on the tail of the word.
+  %  append([H], W2Tail, W2).                            % Add the head back to the transformed tail.
 
 % Ce prédicat met en relation l'ensemble de règles _rule_set et les deux mots _w1 et
 % _w2 lorsque _w2 peut être obtenu à partir de _w1 en y appliquant une règle de
 % _rule_set sur l'un de ses facteurs.
-% Ce prédicat est vrai lorsque w2 peut être obtenu à partir de w1 en y appliquant une règle de rule_set sur l'un de ses facteurs.
+% Échoue si aucune règle dans l'ensemble de règles ne peut être appliquée.
+% Échoue si aucune règle ne permet de faire la transformation.
 rewrite([], _, _).  % Échoue si aucune règle ne permet de faire la transformation.
-rewrite([RuleToApply|_], word(W1), word(W2)) :-
-    rewrite_factor_by_rule(RuleToApply, word(W1), word(W2)).
-rewrite([_|RestRulesToApply], word(W1), word(W2)) :-
-    rewrite(RestRulesToApply, word(W1), word(W2)).
+rewrite([RuleToApply | RestRulesToApply], word(Word1), word(Word3)) :-
+    (   rewrite_factor_by_rule(RuleToApply, word(Word1), word(Word2)),
+        Word1 \= Word2  % Si le mot a changé, réapplique les règles depuis le début.
+    ->  rewrite([RuleToApply | RestRulesToApply], word(Word2), word(Word3))
+    ;   rewrite(RestRulesToApply, word(Word1), word(Word3))  % Sinon, passe à la règle suivante.
+    ).
 
 
 % Ce prédicat met en relation l'ensemble de règles _rule_set, l'entier _len, le mot

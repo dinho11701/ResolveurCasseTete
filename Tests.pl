@@ -194,15 +194,25 @@ main :-
     %MaxLength = 5,
 
     %write('w'),
+
+    %rewrite_factor_by_rule(rule(word([1, 2]), word([3,3])), word([1,2,1,1,2]), word(NewWord3)),
+
+    rewrite_factor_by_rule(rule(word([1, 2]), word([3,3])), word([1,2,1,1,2]), Results),
+    print_all_words(Results).
+
+    %print_word(word(NewWord3)),
+
     %rewrite_prefix_by_rule(rule(word([1, 2]), word([3,3])), word([1,2,1,1]), word(NewWord)),
     %rewrite_factor_by_rule(rule(word([1, 2]), word([2,1,2])), word([1,2,1,1]), word(NewWord1)),
     %rewrite_factor_by_rule(rule(word([1, 2]), word([2, 1, 2])), InitialWord, word(W2)).
-    %print_word(word(NewWord)).
-    %print_word(word(NewWord1)).
-
-    RuleToApply = [ rule(word([1,1]), word([1])), rule(word([1,2]), word([2,1,2])), rule(word([2,1]), word([])) ],
-    rewrite(RuleToApply, word([1,2,1,1]) , word(W2)),
-    print_word(word(W2)).
+    %print_word(word(NewWord)),
+    write('ici').
+    %nl,
+    %print_word(word(NewWord1)),
+    %nl,
+    %RuleToApply = [ rule(word([1,1]), word([1])), rule(word([1,2]), word([2,1,2])), rule(word([2,1]), word([])) ],
+    %rewrite(RuleToApply, word([1,2,1,1]) , word(W2)),
+    %print_word(word(W2)).
     %write('g').
 
     %rewrite(RuleSet1, word([1,2,1,1]), word(W2)),

@@ -139,17 +139,18 @@ rewrite_factor_by_rule(Rule, Word, Results) :-
 % Échoue si aucune règle ne permet de faire la transformation.
 % Échoue si aucune règle dans l'ensemble de règles ne peut être appliquée.
 % Échoue si aucune règle dans l'ensemble de règles ne peut être appliquée.
-rewrite(rules([]), _, _) :- fail.
+% Vérifie si un mot peut être réécrit en utilisant une des règles dans l'ensemble.
+% Collecte toutes les réécritures possibles en utilisant toutes les règles de l'ensemble.
+rewrite(rules([]), _, []) :- !.
+rewrite(rules([Rule|Rules]), word(W1), AllRewrites) :-
+    rewrite_factor_by_rule(Rule, word(W1), RewritesForRule),
+    rewrite(rules(Rules), word(W1), RewritesForRest),
+    append(RewritesForRule, RewritesForRest, AllRewrites).
 
-% Applique la première règle de l'ensemble de règles sur le mot.
-% Si la règle est appliquée avec succès et change le mot, réessaye avec l'ensemble complet de règles.
-% Si la règle n'est pas applicable ou ne change pas le mot, passe à la règle suivante.
-rewrite(rules([RuleToApply|RestRulesToApply]), word(W1), word(W3)) :-
-    rewrite_factor_by_rule(RuleToApply, word(W1), word(W2)),
-    (   W1 \= W2
-    ->  rewrite(rules([RuleToApply|RestRulesToApply]), word(W2), word(W3))
-    ;   rewrite(rules(RestRulesToApply), word(W1), word(W3))
-    ).
+% Vos prédicats rewrite_factor_by_rule, apply_rule_at et apply_rule_at_position restent inchangés.
+
+
+% Vos prédicats rewrite_factor_by_rule, apply_rule_at et apply_rule_at_position restent inchangés.
 
 
 

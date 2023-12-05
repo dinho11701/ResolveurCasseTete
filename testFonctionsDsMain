@@ -126,7 +126,8 @@ print_puzzle(puzzle(RuleSet, Word)) :-
 
 
 % Ce prédicat est vrai lorsque _path est un chemin et l'imprime.
-print_path( path([]) ).
+print_path( path([]) ) :- 
+    write('Le chemin est vide'), nl.
 print_path( path(LST) ) :-
     print_word_list(LST).
     
@@ -247,7 +248,16 @@ connecting_path(rule_set(Rules), Len, word(W1), path(FullPath), word(W2)) :-
     member(FullPath, Paths).
 
 
-
+find_and_print_all_paths(RuleSet, Len, StartWord, EndWord) :-
+    
+    findall(Path, 
+        connecting_path(RuleSet, Len, word(StartWord), path(Path), word(EndWord)),AllPaths),
+    write('finit connect'),
+    nl,
+    write(AllPaths),
+    nl,
+    %print_path_list(AllPaths),
+    write('fo').
 
 
 
@@ -402,12 +412,28 @@ main:-
     
     write('OUII cas de base'),
     nl,
-    connecting_path(_test_gen_connectpath, 4, word([1,2,1,1]), Path_general , word([])),
+    %connecting_path(_test_gen_connectpath, 4, word([1,2,1,1]), Path_general , word([])),
     
-    print_path( Path_general ),
+    %print_path( Path_general ),
     
-    %rewrite_factor_by_rule(rule(word([1,1]), word([1])), word([1,2,1,1]), Results3),
-    %print_all_words(Results3),
+
+    nl,
+    write('commence affichage'),
+    % Exemple d'appel
+    TestPaths = [
+        path([word([1,2,1,1]), word([2,1,2,1,1]), word([2,1]), word([])]),
+        path([word([1,2,1,1]), word([1,2,1]), word([2,1,2,1]), word([2,1]), word([])])
+    ],
+    
+    TestPaths1 = [
+        
+    ],
+
+% Appel de print_path_list avec cette liste de test
+    %print_path_list(TestPaths),
+    %write(TestPaths),
+    find_and_print_all_paths(_test_gen_connectpath, 4, [1,2,1,1], []),
+
     
 
     write('OUII final').

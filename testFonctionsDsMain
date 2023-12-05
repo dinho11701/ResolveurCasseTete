@@ -297,6 +297,7 @@ puzzle_solution(Puzzle, Len, AllSolutions) :-
 % Ce prédicat met en relation les règles _rule_1 et _rule_2 lorsque _rule_2 est
 % obtenue en échangeant les deux mots constituant _rule_1.
 % Ce prédicat est vrai lorsque rule_2 est obtenue en échangeant les deux mots constituant rule_1.
+%faire le cas ou ya vide?
 rule_reversion(rule(word(Word1), word(Word2)), rule(word(Word2), word(Word1))).
 
 
@@ -306,9 +307,11 @@ rule_reversion(rule(word(Word1), word(Word2)), rule(word(Word2), word(Word1))).
 % _w lorsque _w est un mot R-magique admettant une solution de longueur _len où R
 % est l'ensemble _rule_set.
 % Ce prédicat est vrai si w est un mot R-magique admettant une solution de longueur len où R est l'ensemble rule_set.
+% Ce prédicat est vrai si _w est un mot R-magique admettant une solution de longueur _len.
 magic_word_of_rule_set(RuleSet, Len, word(W)) :-
-    connecting_path(RuleSet, Len, word(W), path(Path), word([])),
-    length(Path, Len).  % Vérifie que la longueur du chemin trouvé est égale à Len.
+    find_and_print_all_paths(RuleSet, Len, W, []),
+    length(Path, Len).
+
 
 
 /*
@@ -457,6 +460,14 @@ main:-
     % marche find_and_print_all_paths(_test_gen_connectpath, 4, [1,2,1,1], []),
     
     puzzle_solution(_puzzle_test, 4, AllSolutions),
+
+    nl,
+    write('letss go'),
+    nl,
+    write('on est ici mon gars'),
+    nl,
+    % Exemple d'appel
+    magic_word_of_rule_set(_test_gen_connectpath, 4, word([1,2,1,1])),
 
     
 

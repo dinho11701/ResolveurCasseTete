@@ -278,10 +278,19 @@ find_and_print_all_paths(RuleSet, Len, StartWord, EndWord) :-
 
 
 % Ce prédicat est vrai si Solution est une solution de longueur MaxLength pour le casse-tête Puzzle.
-puzzle_solution(puzzle(RuleSet, InitialWord), MaxLength, Solution) :-
-    connecting_path(RuleSet, MaxLength, word(InitialWord), path(Solution), word([])),
-    length(Solution, Length),
-    Length =< MaxLength.
+%puzzle_solution(puzzle(RuleSet, InitialWord), MaxLength, Solution) :-
+ %   connecting_path(RuleSet, MaxLength, word(InitialWord), path(Solution), word([])),
+  %  length(Solution, Length),
+   % Length =< MaxLength.
+
+
+% Ce prédicat est vrai si _solution est une solution de longueur _len pour le casse-tête _puzzle.
+puzzle_solution(Puzzle, Len, AllSolutions) :-
+    Puzzle = puzzle(RuleSet, word(InitialWord)),
+    nl,
+    write('oui'),
+    find_and_print_all_paths(RuleSet, Len, InitialWord, EndWord).
+
 
 
 
@@ -393,6 +402,18 @@ main:-
         ]
     ),
 
+
+    _puzzle_test = puzzle(
+        rule_set(
+            [
+                rule(word([1, 1]), word([1])),
+                rule(word([1, 2]), word([2, 1, 2])),
+                rule(word([2, 1]), word([]))
+            ]
+        ),
+        word([1, 2, 1, 1])
+    ),
+
     
 
     
@@ -432,7 +453,10 @@ main:-
 % Appel de print_path_list avec cette liste de test
     %print_path_list(TestPaths),
     %write(TestPaths),
-    find_and_print_all_paths(_test_gen_connectpath, 4, [1,2,1,1], []),
+    
+    % marche find_and_print_all_paths(_test_gen_connectpath, 4, [1,2,1,1], []),
+    
+    puzzle_solution(_puzzle_test, 4, AllSolutions),
 
     
 

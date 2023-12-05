@@ -282,6 +282,13 @@ find_and_print_all_paths(RuleSet, Len, StartWord, EndWord) :-
  %   connecting_path(RuleSet, MaxLength, word(InitialWord), path(Solution), word([])),
   %  length(Solution, Length),
    % Length =< MaxLength.
+   
+% Collecte tous les chemins possibles de réécriture jusqu'à un mot vide
+find_all_solutions(RuleSet, Len, StartWord, EndWord, AllSolutions) :-
+    findall(Path, 
+        connecting_path(RuleSet, Len, word(StartWord), path(Path), word(EndWord)),
+        AllSolutions).
+
 
 
 % Ce prédicat est vrai si _solution est une solution de longueur _len pour le casse-tête _puzzle.
@@ -289,7 +296,8 @@ puzzle_solution(Puzzle, Len, AllSolutions) :-
     Puzzle = puzzle(RuleSet, word(InitialWord)),
     nl,
     write('oui'),
-    find_and_print_all_paths(RuleSet, Len, InitialWord, EndWord).
+    %find_and_print_all_paths(RuleSet, Len, InitialWord, EndWord).
+    find_all_solutions(RuleSet, Len, InitialWord, EndWord, AllSolutions).
 
 
 
@@ -314,64 +322,14 @@ magic_word_of_rule_set(RuleSet, Len, word(W)) :-
 
 
 
-/*
-% Ce prédicat génère tous les mots possibles jusqu'à une certaine longueur.
-generate_all_words(MaxLen, Words) :-
-    findall(Word, between(1, MaxLen, Len), generate_word(Len, Word), Words).
-
-% Génère un mot de longueur spécifiée.
-generate_word(Len, word(Word)) :-
-    length(Word, Len),
-    maplist(between(0, 9), Word).  % Ici, on suppose que les "lettres" du mot sont des chiffres de 0 à 9.
-
-% Ce prédicat est vrai lorsque MagicWords est la liste de tous les mots R-magiques pour RuleSet avec une solution de longueur Len.
-all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
-    MaxWordLen is Len * 2,  % Hypothèse sur la longueur maximale des mots à générer.
-    generate_all_words(MaxWordLen, AllWords),
-    include(magic_word_of_rule_set_helper(RuleSet, Len), AllWords, MagicWords).
-
-% Helper pour filtrer les mots R-magiques.
-magic_word_of_rule_set_helper(RuleSet, Len, Word) :-
-    magic_word_of_rule_set(RuleSet, Len, Word).
-
-
-% Trouve toutes les solutions possibles pour un puzzle donné jusqu'à une certaine longueur.
-all_puzzle_solutions(Puzzle, MaxLength, Solutions) :-
-    findall(Solution, puzzle_solution(Puzzle, MaxLength, Solution), Solutions).
-
-*/
 
 
 
-
-% Génère tous les mots possibles jusqu'à une certaine longueur.
-generate_all_words(MaxLen, Words) :-
-    findall(Word, (between(1, MaxLen, Len), generate_word(Len, Word)), Words).
-
-% Génère un mot de longueur spécifiée.
-generate_word(Len, word(Word)) :-
-    length(Word, Len),
-    maplist(between(0, 9), Word).  % Les "lettres" du mot sont des chiffres de 0 à 9.
+all_puzzle_solutions(puzzle(RuleSet, word(InitialWord)), Len, Solutions) :-
+    puzzle_solution(puzzle(RuleSet, word(InitialWord)), Len, Solutions).
 
 
-% Helper pour filtrer les mots R-magiques.
-magic_word_of_rule_set_helper(RuleSet, Len, Word) :-
-    magic_word_of_rule_set(RuleSet, Len, Word).
 
-% Ce prédicat est vrai lorsque MagicWords est la liste de tous les mots R-magiques pour RuleSet avec une solution de longueur Len.
-all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
-    MaxWordLen is Len * 2,  % Hypothèse sur la longueur maximale des mots à générer.
-    generate_all_words(MaxWordLen, AllWords),
-    include(magic_word_of_rule_set_helper(RuleSet, Len), AllWords, MagicWords).
-
-% Trouve toutes les solutions possibles pour un puzzle donné jusqu'à une certaine longueur.
-%all_puzzle_solutions(Puzzle, MaxLength, Solutions) :-
- %   findall(Solution, puzzle_solution(Puzzle, MaxLength, Solution), Solutions).
-
-
-% Trouve toutes les solutions possibles pour un puzzle donné jusqu'à une certaine longueur.
-all_puzzle_solutions(Puzzle, MaxLength, Solutions) :-
-    findall(Solution, (puzzle_solution(Puzzle, MaxLength, Solution), Solution \= []), Solutions).
 
 
 
@@ -469,8 +427,22 @@ main:-
     % Exemple d'appel
     magic_word_of_rule_set(_test_gen_connectpath, 4, word([1,2,1,1])),
 
-    
+    puzzle_1(_puzzle),
+    _len is 4,
+    write("Puzzle:\n"),
+    print_puzzle(_puzzle),
+    nl,
+    format("Solutions of length ~d:\n", [_len]),
+    all_puzzle_solutions(_puzzle, _len, _solutions),
 
+    
+    write('ecris la'),
+    nl,
+    %mon print_path_list(_solutions) marche pas
+    write(_solutions),
+    nl,
+    write('biien finit'),
+    nl,
     write('OUII final').
     
     

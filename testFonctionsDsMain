@@ -316,9 +316,10 @@ rule_reversion(rule(word(Word1), word(Word2)), rule(word(Word2), word(Word1))).
 % est l'ensemble _rule_set.
 % Ce prédicat est vrai si w est un mot R-magique admettant une solution de longueur len où R est l'ensemble rule_set.
 % Ce prédicat est vrai si _w est un mot R-magique admettant une solution de longueur _len.
-magic_word_of_rule_set(RuleSet, Len, word(W)) :-
-    find_and_print_all_paths(RuleSet, Len, W, []),
-    length(Path, Len).
+%magic_word_of_rule_set(RuleSet, Len, word(W)) :-
+    %find_and_print_all_paths(RuleSet, Len, W, []),
+ %   find_all_solutions(RuleSet, Len, InitialWord, EndWord, AllSolutions),
+  %  length(Path, Len).
 
 
 
@@ -326,10 +327,43 @@ magic_word_of_rule_set(RuleSet, Len, word(W)) :-
 
 
 all_puzzle_solutions(puzzle(RuleSet, word(InitialWord)), Len, Solutions) :-
+    write('debut test_1'),
     puzzle_solution(puzzle(RuleSet, word(InitialWord)), Len, Solutions).
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Vérifie si un mot est un mot magique.
+magic_word_of_rule_set(RuleSet, Len, word(W)) :-
+    find_all_solutions(RuleSet, Len, W, [], Solutions),
+    Solutions \= [].
+
+% Génère une liste de tous les mots possibles jusqu'à une certaine longueur.
+generate_possible_words(MaxWordLength, PossibleWords) :-
+    findall(word(Word), (length(Word, Length), Length =< MaxWordLength, Length > 0, fill_word(Word)), PossibleWords).
+
+% Remplit un mot avec des chiffres de 1 à 9.
+fill_word([]).
+fill_word([H|T]) :-
+    between(1, 9, H),
+    fill_word(T).
+
+% Trouve tous les mots magiques pour un ensemble de règles donné et une longueur de chemin donnée.
+all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
+    MaxWordLength = 4,  % Longueur maximale des mots
+    write('generation faite').
+    %generate_possible_words(MaxWordLength, PossibleWords).
+    %write('generation faite').
+    %findall(Word, 
+     %   (member(word(Word), PossibleWords),
+      %   magic_word_of_rule_set(RuleSet, Len, word(Word))),
+       % MagicWords).
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
@@ -425,7 +459,7 @@ main:-
     write('on est ici mon gars'),
     nl,
     % Exemple d'appel
-    magic_word_of_rule_set(_test_gen_connectpath, 4, word([1,2,1,1])),
+    %magic_word_of_rule_set(_test_gen_connectpath, 4, b word([1,2,1,1])),
 
     puzzle_1(_puzzle),
     _len is 4,
@@ -443,6 +477,20 @@ main:-
     nl,
     write('biien finit'),
     nl,
+    
+    write('debut test2'),
+    nl,
+    nl,
+    rule_set_123(_rule_set),
+    _len1 is 3,
+    write("Rule set:\n"),
+    print_rule_set(_rule_set),
+    format("Magic words having solutions of length ~d:\n", [_len1]),
+    all_magic_words_of_rule_set(_rule_set, _len1, _magic_words),
+    %write(_magic_words),
+
+    
+    
     write('OUII final').
     
     

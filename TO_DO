@@ -1,0 +1,28 @@
+
+Astuce:
+l'idée est de pouvoir partir de la derniere regle 
+et prendre le mot pour pouvoir partir a lenvers en utilisant une regle a l'envers
+qui est ceci.
+rule_reversion(rule(word(Word1), word(Word2)), rule(word(Word2), word(Word1))).
+
+ensuite tu utilises refactor_by_rule et tu generes des mots magiques et pour chacun encore des mots magiques 
+apply_rule_at(rule(word(Factor), word(Replacement)), Prefix, Suffix, Result) :-
+    append(Factor, RestSuffix, Suffix),
+    append(Replacement, RestSuffix, NewSuffix),
+    append(Prefix, NewSuffix, Result).
+
+
+apply_rule_at_position(rule(word(Factor), word(Replacement)), word(W1), Position, word(W2)) :-
+    append(Prefix, Suffix, W1),
+    length(Prefix, Position),
+    append(Factor, RestSuffix, Suffix),
+    append(Replacement, RestSuffix, NewSuffix),
+    append(Prefix, NewSuffix, W2).
+
+
+rewrite_factor_by_rule(Rule, Word, Results) :-
+    findall(NewW, (
+        between(0, 100, Position), 
+        apply_rule_at_position(Rule, Word, Position, NewW)
+    ), ResultsWithDuplicates),
+    list_to_set(ResultsWithDuplicates, Results). 

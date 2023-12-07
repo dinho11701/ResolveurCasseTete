@@ -285,7 +285,7 @@ find_and_print_all_paths(RuleSet, Len, StartWord, EndWord) :-
    
 % Collecte tous les chemins possibles de réécriture jusqu'à un mot vide
 find_all_solutions(RuleSet, Len, StartWord, EndWord, AllSolutions) :-
-    findall(Path, 
+    findall(path(Path), 
         connecting_path(RuleSet, Len, word(StartWord), path(Path), word(EndWord)),
         AllSolutions).
 
@@ -340,26 +340,30 @@ magic_word_of_rule_set(RuleSet, Len, word(W)) :-
     find_all_solutions(RuleSet, Len, W, [], Solutions),
     Solutions \= [].
 
-% Génère une liste de tous les mots possibles jusqu'à une certaine longueur.
-generate_possible_words(MaxWordLength, PossibleWords) :-
-    findall(word(Word), (length(Word, Length), Length =< MaxWordLength, Length > 0, fill_word(Word)), PossibleWords).
 
-% Remplit un mot avec des chiffres de 1 à 9.
+% Trouve la séquence de la dernière règle qui mène à un mot vide.
+last_rule_sequence(RuleSet, LastRuleSequence) :-
+    last(RuleSet, rule(word(LastRuleSequence), word([]))).
+
+% Génère une liste de tous les mots candidats.
+generate_possible_words(MaxWordLength, PossibleWords) :-
+    findall(Word, (between(1, MaxWordLength, Length), length(Word, Length), fill_word(Word)), PossibleWords).
+
+% Remplit un mot avec des chiffres (dans votre cas, de 1 à 2).
 fill_word([]).
 fill_word([H|T]) :-
-    between(1, 9, H),
+    between(1, 2, H),
     fill_word(T).
 
 % Trouve tous les mots magiques pour un ensemble de règles donné et une longueur de chemin donnée.
 all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
-    MaxWordLength = 4,  % Longueur maximale des mots
-    write('generation faite').
-    %generate_possible_words(MaxWordLength, PossibleWords).
-    %write('generation faite').
-    %findall(Word, 
-     %   (member(word(Word), PossibleWords),
-      %   magic_word_of_rule_set(RuleSet, Len, word(Word))),
-       % MagicWords).
+    MaxWordLength = Len,  % Longueur maximale des mots à tester
+    generate_possible_words(MaxWordLength, PossibleWords),
+    findall(Word, 
+        (member(Word, PossibleWords),
+         magic_word_of_rule_set(RuleSet, Len, word(Word))),
+        MagicWords).
+
 
 
 
@@ -409,6 +413,13 @@ main:-
         word([1, 2, 1, 1])
     ),
 
+    write('test path'),
+    
+    nl,
+    
+    print_path(_path),
+    
+    print_word(word([1,2,1,1])),
     
 
     
@@ -469,11 +480,14 @@ main:-
     format("Solutions of length ~d:\n", [_len]),
     all_puzzle_solutions(_puzzle, _len, _solutions),
 
-    
+    write('test write soln de path'),
+    write(_solutions),
     write('ecris la'),
     nl,
-    %mon print_path_list(_solutions) marche pas
-    write(_solutions),
+    write('test liste de path'),
+    nl,
+    print_path_list(_solutions),
+    
     nl,
     write('biien finit'),
     nl,
@@ -487,9 +501,9 @@ main:-
     print_rule_set(_rule_set),
     format("Magic words having solutions of length ~d:\n", [_len1]),
     all_magic_words_of_rule_set(_rule_set, _len1, _magic_words),
-    %write(_magic_words),
+    write(_magic_words),
 
-    
+    %last_rule_sequence(RuleSet, LastRuleSequence)
     
     write('OUII final').
     

@@ -341,9 +341,10 @@ magic_word_of_rule_set(RuleSet, Len, word(W)) :-
     Solutions \= [].
 
 
-% Trouve la séquence de la dernière règle qui mène à un mot vide.
-last_rule_sequence(RuleSet, LastRuleSequence) :-
-    last(RuleSet, rule(word(LastRuleSequence), word([]))).
+% Vérifie si un mot est un mot magique.
+magic_word_of_rule_set(RuleSet, Len, Word) :-
+    find_all_solutions(RuleSet, Len, Word, [], Solutions),
+    Solutions \= [].
 
 % Génère une liste de tous les mots candidats.
 generate_possible_words(MaxWordLength, PossibleWords) :-
@@ -357,7 +358,7 @@ fill_word([H|T]) :-
 
 % Trouve tous les mots magiques pour un ensemble de règles donné et une longueur de chemin donnée.
 all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
-    MaxWordLength = Len,  % Longueur maximale des mots à tester
+    MaxWordLength = 6,  % Longueur maximale des mots à tester
     generate_possible_words(MaxWordLength, PossibleWords),
     findall(Word, 
         (member(Word, PossibleWords),

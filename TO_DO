@@ -26,3 +26,12 @@ rewrite_factor_by_rule(Rule, Word, Results) :-
         apply_rule_at_position(Rule, Word, Position, NewW)
     ), ResultsWithDuplicates),
     list_to_set(ResultsWithDuplicates, Results). 
+
+dis à chatgpt de use ds la fonction finale
+
+% Vérifie si un mot est un mot magique.
+magic_word_of_rule_set(RuleSet, Len, word(W)) :-
+    find_all_solutions(RuleSet, Len, W, [], Solutions),
+    Solutions \= [].
+
+car il l'a oublié

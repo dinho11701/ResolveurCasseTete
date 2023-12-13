@@ -343,22 +343,7 @@ magic_word_of_rule_set(RuleSet, Len, word(W)) :-
 % Réversion de la règle.
 rule_reversion(rule(word(Word1), word(Word2)), rule(word(Word2), word(Word1))).
 
-% Génère des mots magiques en utilisant des règles inversées.
-generate_magic_words(RuleSet, ReversedRule, MaxSteps, GeneratedWords) :-
-    findall(Word, generate_word(ReversedRule, MaxSteps, [], Word), ReversedWords),
-    include(magic_word_checker(RuleSet, MaxSteps), ReversedWords, GeneratedWords).
 
-% Génère un mot en utilisant une règle inversée.
-generate_word(ReversedRule, 0, Word, Word).
-generate_word(ReversedRule, Steps, CurrentWord, GeneratedWord) :-
-    Steps > 0,
-    rewrite_factor_by_rule(ReversedRule, word(CurrentWord), [word(NextWord)]),
-    NewSteps is Steps - 1,
-    generate_word(ReversedRule, NewSteps, NextWord, GeneratedWord).
-
-% Helper pour vérifier si un mot est un mot magique.
-magic_word_checker(RuleSet, Len, Word) :-
-    magic_word_of_rule_set(RuleSet, Len, Word).
 
 % Trouve la dernière règle dans un ensemble de règles.
 last_rule_in_set(RuleSet, LastRule) :-
@@ -370,22 +355,76 @@ last_rule([Rule], Rule).
 last_rule([_|Tail], LastRule) :-
     last_rule(Tail, LastRule).
 
-   
+
+% Vérifie si un mot est un mot magique.
+is_magic_word(RuleSet, Len, Word) :-
+    magic_word_of_rule_set(RuleSet, Len, Word).
 
 
-% Trouve tous les mots magiques pour un ensemble de règles donné et une longueur de chemin donnée.
+% Filtrez les mots pour ne garder que ceux qui sont magiques.
+filter_magic_words(_, _, [], []).
+filter_magic_words(RuleSet, Len, [Word | Rest], [Word | MagicWords]) :-
+    magic_word_of_rule_set(RuleSet, Len, Word), !,
+    filter_magic_words(RuleSet, Len, Rest, MagicWords).
+filter_magic_words(RuleSet, Len, [_ | Rest], MagicWords) :-
+    filter_magic_words(RuleSet, Len, Rest, MagicWords).
+
+
+% Predicate to recursively generate predecessors for a single word
+generate_predecessors_for_word(ReversedRules, Steps, Word, Predecessors) :-
+    generate_predecessors(ReversedRules, Steps, Word, Predecessors).
+
+% Predicate to be used with foldl to generate predecessors for multiple words
+generate_predecessors_foldl(ReversedRules, Steps, Word, Acc, UpdatedAcc) :-
+    generate_predecessors_for_word(ReversedRules, Steps, Word, Predecessors),
+    append(Acc, Predecessors, UpdatedAcc).
+
+% Updated generate_predecessors predicate
+generate_predecessors(ReversedRules, 0, CurrentWord, [CurrentWord]).
+generate_predecessors(ReversedRules, Steps, CurrentWord, AllPredecessors) :-
+    Steps > 0,
+    NewSteps is Steps - 1,
+    findall(NextWord, (
+        member(ReversedRule, ReversedRules),
+        rewrite_factor_by_rule(ReversedRule, CurrentWord, PossibleNextWords),
+        member(NextWord, PossibleNextWords)
+    ), NextWords),
+    foldl(generate_predecessors_foldl(ReversedRules, NewSteps), NextWords, [], AllPredecessors).
+
+
+% Helper predicate to reverse all rules in a rule_set
+reverse_rules_in_set(rule_set(Rules), ReversedRules) :-
+    reverse_rules(Rules, ReversedRules).
+
+% Helper predicate to reverse all rules in a list
+reverse_rules([], []).
+reverse_rules([Rule|Tail], [ReversedRule|ReversedTail]) :-
+    reverse_rule(Rule, ReversedRule),
+    reverse_rules(Tail, ReversedTail).
+
+% Helper predicate to reverse a single rule
+reverse_rule(rule(word(A), word(B)), rule(word(B), word(A))).
+
+
+
+% Main predicate to find all magic words of a certain length
 all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
-    % Obtenir la réversion de la dernière règle qui mène à un mot vide.
-    nl,write('hello ensuite debut'),
-    last_rule_in_set(RuleSet, LastRule),
-    write(LastRule),
-    write('hello fin'),
-    nl,
-    rule_reversion(LastRule, ReversedRule),
-    write(ReversedRule),
-    % Générer des mots magiques en utilisant la règle inversée.
-    generate_magic_words(RuleSet, ReversedRule, Len, MagicWords).
+    % Reverse the rules
+    write('hello poto'),
+    reverse_rules_in_set(RuleSet, ReversedRules),
+    write(ReversedRules),
+    % Find all predecessors of the empty word
+    generate_predecessors(ReversedRules, Len, word([]), AllPredecessors),
+    % Filter out the magic words
+    %write(AllPredecessors),nl,
+    %include(is_magic_word(RuleSet, Len), AllPredecessors, MagicWords).
+    include(is_magic_word_for_set_and_len(RuleSet, Len), AllPredecessors, MagicWords).
+    % Ensure the length of the magic words is Len
+    %maplist(correct_length(Len), MagicWords).
 
+% Prédicat d'aide pour adapter is_magic_word à include
+is_magic_word_for_set_and_len(RuleSet, Len, Word) :-
+    is_magic_word(RuleSet, Len, Word).
 
 
 
@@ -525,7 +564,7 @@ main:-
     write('hello avant'),
     all_magic_words_of_rule_set(_rule_set, _len1, _magic_words),
     write('gogogo fiiin'),nl,
-    write(_magic_words),
+    nl,nl,print_word_list(_magic_words),%write(_magic_words),
     nl,
     %last_rule_sequence(RuleSet, LastRuleSequence)
     

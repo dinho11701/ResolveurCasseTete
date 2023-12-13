@@ -418,17 +418,16 @@ all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
     % Filter out the magic words
     %write(AllPredecessors),nl,
     %include(is_magic_word(RuleSet, Len), AllPredecessors, MagicWords).
-    include(is_magic_word_for_set_and_len(RuleSet, Len), AllPredecessors, MagicWords).
-    % Ensure the length of the magic words is Len
-    %maplist(correct_length(Len), MagicWords).
-
+    include(is_magic_word_for_set_and_len(RuleSet, Len), AllPredecessors, FilteredMagicWords),
+    sort(FilteredMagicWords, MagicWords).
+    
 % Prédicat d'aide pour adapter is_magic_word à include
 is_magic_word_for_set_and_len(RuleSet, Len, Word) :-
     is_magic_word(RuleSet, Len, Word).
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 

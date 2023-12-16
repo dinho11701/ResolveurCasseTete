@@ -8,12 +8,6 @@
 */
 
 
-puzzle_1(puzzle(_rule_set, word([1, 2, 1, 1]))) :-
-    rule_set_123(_rule_set).
-
-
-
-
 % Ce prédicat est vrai lorsque W est un mot et l'imprime.
 print_word(word([])) :-
     write('e'),
@@ -211,8 +205,8 @@ magic_word_of_rule_set(RuleSet, Len, word(W)) :-
 
 
 % Prédicat pour générer de manière récursive les prédécesseurs d'un seul mot.
-generate_predecessors_for_word(ReversedRules, Steps, Word, Predecessors) :-
-    generate_predecessors(ReversedRules, Steps, Word, Predecessors).
+generate_predecessors_for_word(_, Steps, Word, Predecessors) :-
+    generate_predecessors(_, Steps, Word, Predecessors).
 
 % Prédicat à utiliser avec foldl pour générer les prédécesseurs de plusieurs mots.
 generate_predecessors_foldl(ReversedRules, Steps, Word, Acc, UpdatedAcc) :-

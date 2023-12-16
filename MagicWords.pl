@@ -8,6 +8,7 @@
 */
 
 
+
 % Ce prédicat est vrai lorsque W est un mot et l'imprime.
 print_word(word([])) :-
     write('e'),
@@ -67,11 +68,11 @@ print_puzzle(puzzle(RuleSet, Word)) :-
 
 
 % Ce prédicat est vrai lorsque _path est un chemin et l'imprime.
-print_path( path([]) ) :- 
+print_path( path([]) ) :-
     write('Le chemin est vide'), nl.
 print_path( path(LST) ) :-
     print_word_list(LST).
-    
+
 
 
 % Ce prédicat est vrai lorsque _lst est une liste de chemins et l'imprime, avec un chemin par ligne.
@@ -82,20 +83,20 @@ print_path_list([H|T]) :-
     print_path_list(T).
 
 % Ce prédicat met en relation les trois mots _w1, _w2 et _w3 lorsque _w3 est la concaténation de _w1 et _w2.
-word_concatenation(word(Word1),word(Word2),word(Word3)) :- 
+word_concatenation(word(Word1),word(Word2),word(Word3)) :-
     append(Word1,Word2,Word3).
 
 
 
 % Ce prédicat met en relation la règle _rule et les deux mots _w1 et _w2 lorsque
 % _w2 peut être obtenu à partir de _w1 en y appliquant _rule sur l'un de ses préfixes.
-rewrite_prefix_by_rule(rule(word(Prefix), word(Replacement)), word(W1), word(W2)) :- 
+rewrite_prefix_by_rule(rule(word(Prefix), word(Replacement)), word(W1), word(W2)) :-
     word_concatenation(word(Prefix), word(Suffix), word(W1)),  % Concatène Prefix et Suffix pour former W1.
     word_concatenation(word(Replacement), word(Suffix), word(W2)).  % Concatène Replacement et Suffix pour former W2.
 
 /*
-Ce prédicat applique une règle de réécriture à une position spécifiée 
-dans un mot. Il divise d'abord le mot en un préfixe et un suffixe 
+Ce prédicat applique une règle de réécriture à une position spécifiée
+dans un mot. Il divise d'abord le mot en un préfixe et un suffixe
 à la position donnée, applique ensuite la règle de réécriture au suffixe,
 et enfin, concatène le préfixe inchangé avec le nouveau suffixe pour former le mot modifié. */
 apply_rule_at_position(rule(word(Factor), word(Replacement)), word(W1), Position, word(W2)) :-
@@ -115,10 +116,10 @@ _w2 peut être obtenu à partir de _w1 en y appliquant _rule sur l'un de ses
 facteurs.*/
 rewrite_factor_by_rule(Rule, Word, Results) :-
     findall(NewW, (
-        between(0, 100, Position), 
+        between(0, 100, Position),
         apply_rule_at_position(Rule, Word, Position, NewW)
     ), ResultsWithDuplicates),
-    list_to_set(ResultsWithDuplicates, Results). 
+    list_to_set(ResultsWithDuplicates, Results).
 
 
 
@@ -148,7 +149,7 @@ connecting_path(rule_set(Rules), 1, word(W1), path([word(W1)]), word([])) :-
 connecting_path(rule_set(Rules), Len, word(W1), path(FullPath), word(W2)) :-
     Len > 1,
     NewLen is Len - 1,
-    findall(ExtendedPath, 
+    findall(ExtendedPath,
         (
             member(Rule, Rules),
             rewrite_factor_by_rule(Rule, word(W1), Intermediates),
@@ -162,12 +163,13 @@ connecting_path(rule_set(Rules), Len, word(W1), path(FullPath), word(W2)) :-
 
 /*
 Le prédicat find_all_solutions est utilisé pour trouver toutes les solutions possibles,
-sous forme de chemins de réécriture, qui permettent de transformer un mot de départ (StartWord) 
-en un mot d'arrivée (EndWord) en utilisant un ensemble de règles de réécriture (RuleSet) et ce, 
+sous forme de chemins de réécriture, qui permettent de transformer un mot de départ (StartWord)
+en un mot d'arrivée (EndWord) en utilisant un ensemble de règles de réécriture (RuleSet) et ce,
 en un nombre spécifié d'étapes (Len). Il utilise findall pour collecter tous les chemins possibles
-correspondant à ces critères dans la liste AllSolutions. */
+correspondant à ces critères dans la liste AllSolutions
+*/
 find_all_solutions(RuleSet, Len, StartWord, EndWord, AllSolutions) :-
-    findall(path(Path), 
+    findall(path(Path),
         connecting_path(RuleSet, Len, word(StartWord), path(Path), word(EndWord)),
         AllSolutions).
 
@@ -188,6 +190,9 @@ puzzle_solution(Puzzle, Len, AllSolutions) :-
 rule_reversion(rule(word(Word1), word(Word2)), rule(word(Word2), word(Word1))).
 
 
+
+
+
 /*
 Ce prédicat met en relation l'instance de casse-tête _puzzle, l'entier _len et la
 liste de chemins _solutions lorsque l'instance de casse-tête en question possède comme
@@ -205,8 +210,8 @@ magic_word_of_rule_set(RuleSet, Len, word(W)) :-
 
 
 % Prédicat pour générer de manière récursive les prédécesseurs d'un seul mot.
-generate_predecessors_for_word(_, Steps, Word, Predecessors) :-
-    generate_predecessors(_, Steps, Word, Predecessors).
+generate_predecessors_for_word(ReversedRules, Steps, Word, Predecessors) :-
+    generate_predecessors(ReversedRules, Steps, Word, Predecessors).
 
 % Prédicat à utiliser avec foldl pour générer les prédécesseurs de plusieurs mots.
 generate_predecessors_foldl(ReversedRules, Steps, Word, Acc, UpdatedAcc) :-
@@ -214,9 +219,9 @@ generate_predecessors_foldl(ReversedRules, Steps, Word, Acc, UpdatedAcc) :-
     append(Acc, Predecessors, UpdatedAcc).
 
 /*
-Le prédicat generate_predecessors est conçu pour 
-générer de manière récursive tous les prédécesseurs possibles 
-d'un mot donné en utilisant un ensemble de règles inversées */ 
+Le prédicat generate_predecessors est conçu pour
+générer de manière récursive tous les prédécesseurs possibles
+d'un mot donné en utilisant un ensemble de règles inversées */
 generate_predecessors(_, 0, CurrentWord, [CurrentWord]).
 generate_predecessors(ReversedRules, Steps, CurrentWord, AllPredecessors) :-
     Steps > 0,
@@ -242,7 +247,7 @@ reverse_rules([Rule|Tail], [ReversedRule|ReversedTail]) :-
 
 /*Ce prédicat met en relation l'ensemble de règles _rule_set, l'entier _len et le mot
 _w lorsque _w est un mot R-magique admettant une solution de longueur _len où R
-est l'ensemble _rule_set. */
+est l'ensemble _rule_set*/
 all_magic_words_of_rule_set(RuleSet, Len, MagicWords) :-
     reverse_rules_in_set(RuleSet, ReversedRules),
     generate_predecessors(ReversedRules, Len, word([]), AllPredecessors),

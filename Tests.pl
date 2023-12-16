@@ -2,9 +2,9 @@
  * INF6120
  * A2023
  * TP2
- * First name     : FILL IN
- * Last name      : FILL IN
- * Permanent code : FILL IN
+ * First name     : OSWALD
+ * Last name      : ESSONGUE
+ * Permanent code : ESSO16019809
 */
 
 % Importation of the content of MagicWords.pl.
@@ -89,148 +89,109 @@ test_2 :-
 
 
 
-% Prédicat principal (main)
-main :-
 
-    % Appeler print_word avec différents mots
-    % print_word(word([1, 2, 1, 1])).
-    % print_word(word([1, 2, 3, 4])),
-    % print_word(word([2, 1])),
-    % nl,
-    % print_word_list([word([1, 2, 1, 1]),word([1, 2, 3, 4]),word([2, 1])]).
+test_3 :-
 
-    % nl,
-    % print_rule(rule(word([1,2]),word([2,1,2]))).
-    % nl.
-
-
-
-    /******************************************************************************
-    print_rule_set(rule_set(
-        [rule(word([1, 1]), word([1])),
-        rule(word([1, 2]), word([2, 1, 2])),
-        rule(word([2, 1]), word([]))]) ),
-
-    print_puzzle( puzzle( rule_set(
-        [rule(word([1, 1]), word([1])),
-        rule(word([1, 2]), word([2, 1, 2])),
-        rule(word([2, 1]), word([]))]) ) ,  word([1, 2, 1, 1]) ),
-
+    write('Hello World'),
+    
     nl,
-
-    print_path( path([
-            word([1, 2, 1, 1]),
-            word([1, 2, 1]),
-            word([2, 1, 2, 1]),
+    
+    _path = path(
+        [
             word([2, 1]),
             word([])
-        ]) ),
+        ]
+    ),
+    
+    
+    _rule_set_test = rule_set(
+        [
+            rule(word([2, 1]), word([]))
+        ]
+    ),
+    
+    
+    
+    _test_gen_connectpath = rule_set(
+        [
+            rule(word([1, 1]), word([1])),
+            rule(word([1, 2]), word([2, 1, 2])),
+            rule(word([2, 1]), word([]))
+        ]
+    ),
 
+
+
+    write('test path'),
+    
     nl,
+    
+    print_path(_path),
+    
+    print_word(word([1,2,1,1])),
 
-*******************************************************************************/
-
-/******************************************************************************
-
-    print_path( path([]) ),
-
-    nl,
-
-    Chemin1 = path([
-            word([1, 2, 1, 1]),
-            word([1, 2, 1]),
-            word([2, 1, 2, 1]),
-            word([2, 1]),
-            word([])
-        ]),
-
-    Chemin2 = path([
-            word([1,2,3]),
-            word([4,5,6]),
-            word([7,8,9]),
-            word([])
-        ]),
-
-    print_path_list( [ Chemin2,Chemin1 ] ),
-
-    word_concatenation(word([1,2]),word([3,4]),word(Word3)),
-
-    print_word(word(Word3)),
-
-    rewrite_prefix_by_rule(rule(word([1, 2]), word([2,1,2])), word([1,2,1]), word(NewWord)),
-    nl,
-
-    % Affichage du résultat
-    print_word(word(NewWord)),
-*******************************************************************************/
-
-    % RuleToApply = [rule(word([1,1]), word([1])), rule(word([1,2]), word([2,1,2])), rule(word([2,1]), word([]))],
-    % rewrite(RuleToApply, word([1,2,1,1]), word(W2)),
-    % print_word(word(W2)),
-
-
-    /**RuleSet = rule_set(
-            [
-                rule(word([1, 1]), word([1])),
-                rule(word([1, 2]), word([2, 1, 2])),
-                rule(word([2, 1]), word([]))
-            ]
-        ),**/
-    % _len is 3,
-    % connecting_path(RuleSet, _len, word([1,2,1]), path(Path), word([])),
-    % print_word(word(Path)).
-
-    % Définir un ensemble de règles de réécriture pour le casse-tête
-    %RuleSet1 = [rule(word([1, 1]), word([1])),
-     %           rule(word([1, 2]), word([2,1,2])),
-      %         rule(word([2,1]), word([]))],
-
-
-
-    % Définir le mot initial du casse-tête
-    %InitialWord = word([1, 2, 1, 1]),
-
-    % Définir la longueur maximale souhaitée pour la solution
-    %MaxLength = 5,
-
-    %write('w'),
-
-    %rewrite_factor_by_rule(rule(word([1, 2]), word([3,3])), word([1,2,1,1,2]), word(NewWord3)),
-
+    Path_debut = path([word([2,1])]),
+    
     rewrite_factor_by_rule(rule(word([1, 2]), word([3,3])), word([1,2,1,1,2]), Results),
     print_all_words(Results),
+
+    rewrite_factor_by_rule(rule(word([2,1]), word([])), word([2,1]), Results1),
+    
+    print_all_words(Results1),
+
+    connecting_path(   _rule_set_test  , 1 , word([2,1]), Path_debut , word([])),
+    
+    write('OUII cas de base'),
     nl,
-    rewrite(rules([rule(word([1, 1]), word([1])), rule(word([1, 2]), word([2, 1, 2])), rule(word([2, 1]), word([]))]), word([1, 2, 1, 1, 2]), Results1),
-    print_all_words(Results1).
-
-    %print_word(word(NewWord3)),
-
-    %rewrite_prefix_by_rule(rule(word([1, 2]), word([3,3])), word([1,2,1,1]), word(NewWord)),
-    %print_word(word(NewWord)),
-    %nl,
-    %print_word(word(NewWord1)),
-    %nl,
-    %RuleToApply = [ rule(word([1,1]), word([1])), rule(word([1,2]), word([2,1,2])), rule(word([2,1]), word([])) ],
-    %rewrite(RuleToApply, word([1,2,1,1]) , word(W2)),
-    %print_word(word(W2)).
-    %write('g').
-
-    %rewrite(RuleSet1, word([1,2,1,1]), word(W2)),
-    %write('g'),
-    %print_word(word(W2)).
-
-    % Appeler puzzle_solution pour trouver une solution au casse-tête
-    %(   puzzle_solution(puzzle(RuleSet1, InitialWord), MaxLength, Solution)
-    %->  write('Une solution pour le casse-tête est : '), write(Solution), nl
-    %;   write('Aucune solution trouvée pour le casse-tête dans la limite de longueur donnée.'), nl
-    %).
+    connecting_path(_test_gen_connectpath, 4, word([1,2,1,1]), Path_general , word([])),
+    
+    print_path( Path_general ),
+    
 
 
 
+    nl,
+    write('letss go'),
+    nl,
+    write('on est ici mon gars'),
+    nl,
 
 
+    puzzle_1(_puzzle),
+    _len is 4,
+    write("Puzzle:\n"),
+    print_puzzle(_puzzle),
+    nl,
+    format("Solutions of length ~d:\n", [_len]),
+    all_puzzle_solutions(_puzzle, _len, _solutions),
 
+    write('test write soln de path'),
+    write(_solutions),
+    write('ecris la'),
+    nl,
+    write('test liste de path'),
+    nl,
+    print_path_list(_solutions),
+    
+    nl,
+    write('biien finit'),
+    nl,
+    
+    write('debut test2'),
+    nl,
+    nl,
+    rule_set_123(_rule_set),
+    _len1 is 3,
+    write("Rule set:\n"),
+    print_rule_set(_rule_set),
+    format("Magic words having solutions of length ~d:\n", [_len1]),
+    write('hello avant'),
+    all_magic_words_of_rule_set(_rule_set, _len1, _magic_words),
+    write('gogogo fiiin'),nl,
+    nl,nl,print_word_list(_magic_words),
+    nl,
 
+    write('OUII final').
 
 
 
